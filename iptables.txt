@@ -1,0 +1,43 @@
+#iptables -t nat -A PREROUTING -s 192.168.156.0/24 -p tcp --dport 443 -j REDIRECT --to-port 3129
+#iptables -t nat -A PREROUTING -s 192.168.234.0/24 -p tcp --dport 443 -j REDIRECT --to-port 3129
+
+#iptables -t nat -A PREROUTING -s 192.168.156.0/24 -p tcp --dport 80 -j REDIRECT --to-port 3128
+#iptables -t nat -A PREROUTING -s 192.168.234.0/24 -p tcp --dport 80 -j REDIRECT --to-port 3128
+
+#iptables -t nat -A POSTROUTING -o eth2 -j MASQUERADE
+
+--> Salvando
+
+#iptables-save > /etc/iptables.rules
+
+--> Recuperação
+
+Um script de recuperação, inicializado pelo /etc/rc.d/rc.local, poderia ter a seguinte estrutura:
+
+#!/bin/bash
+echo 1 > /proc/sys/net/ipv4/ip_forward
+modprobe iptable_nat
+iptables-restore < /etc/iptables.rules
+insmod ip_conntrack_ftp
+insmod ip_nat_ftp
+
+
+#iptables -t nat -L
+
+Mostra as regras de NAT ativas.
+
+---------------------------------------
+
+#iptables -t nat -F
+
+Apaga todas as regras de NAT existentes.
+
+
+FIRELWELL
+
+
+#Para Logar
+iptables -A FORWARD -j LOG --log-prefix "FIREWALL: FORWARD"
+#Regra
+iptables -A FORWARD -m multiport -p tcp --dport 20,21 -j DROP
+
